@@ -1,9 +1,7 @@
 package fax.play;
 
-import java.util.PriorityQueue;
-
 /**
- * This solution is not efficient.
+ * This solution is now efficient.
  *
  * Requires 3 nested cycles => O(n*amount*amount)
  */
@@ -26,26 +24,22 @@ public class CoinChangeLimitCoinFirst {
          int newCoinValue = coins[i - 1];
          int[] curr = new int[amount + 1];
          for (int j = 0; j <= amount; j++) {
-            // j is the current amount
-            int maxNumberOfNewCoinICanUse = j / newCoinValue;
-            PriorityQueue<Integer> solutions = new PriorityQueue<>();
-            if (prev[j] != IMPOSSIBLE_RESULT) {
-               solutions.add(prev[j]);
-            }
+            int oldSolution = prev[j];
+            int newSolution = IMPOSSIBLE_RESULT;
 
-            for (int k = 1; k <= maxNumberOfNewCoinICanUse; k++) {
-               // k is the number of new coin I'll use
-               int amountGainedWithTheNewCoinUsage = k * newCoinValue;
-               int inspectionOnTheSameLine = curr[j - amountGainedWithTheNewCoinUsage];
+            if (j >= newCoinValue) {
+               int inspectionOnTheSameLine = curr[j - newCoinValue];
                if (inspectionOnTheSameLine != IMPOSSIBLE_RESULT) {
-                  solutions.add(k + inspectionOnTheSameLine);
+                  newSolution = 1 + inspectionOnTheSameLine;
                }
             }
 
-            if (solutions.isEmpty()) {
-               curr[j] = IMPOSSIBLE_RESULT;
+            if (oldSolution == IMPOSSIBLE_RESULT) {
+               curr[j] = newSolution;
+            } else if (newSolution == IMPOSSIBLE_RESULT) {
+               curr[j] = oldSolution;
             } else {
-               curr[j] = solutions.peek();
+               curr[j] = Math.min(oldSolution, newSolution);
             }
          }
          prev = curr;
@@ -53,5 +47,4 @@ public class CoinChangeLimitCoinFirst {
 
       return prev[amount];
    }
-
 }
